@@ -2,45 +2,33 @@ package vibe.roombooking.room;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.test.web.servlet.MockMvc;
 
-import java.util.List;
-
-import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WebMvcTest(RoomController.class)
-public class RoomControllerTest {
+@SpringBootTest
+@AutoConfigureMockMvc
+public class RoomApiIntegrationTest {
 
   @Autowired private MockMvc mockMvc;
 
-  @MockitoBean private RoomService roomService;
-
   @Test
-  void getAllRooms_returnsRooms() throws Exception {
-    when(roomService.getAllRooms())
-        .thenReturn(List.of(new Room(1L, "Alpha", 4), new Room(2L, "Beta", 8)));
-
+  void getAllRooms_returnsAllRooms() throws Exception {
     mockMvc
         .perform(get("/api/rooms"))
         .andExpect(status().isOk())
-        .andExpect(jsonPath("$.length()").value(2))
-        .andExpect(jsonPath("$[0].id").value(1))
+        .andExpect(jsonPath("$.length()").value(3))
         .andExpect(jsonPath("$[0].name").value("Alpha"))
-        .andExpect(jsonPath("$[0].capacity").value(4))
-        .andExpect(jsonPath("$[1].id").value(2))
         .andExpect(jsonPath("$[1].name").value("Beta"))
-        .andExpect(jsonPath("$[1].capacity").value(8));
+        .andExpect(jsonPath("$[2].name").value("Gamma"));
   }
 
   @Test
   void getRoomById_returnsRoom() throws Exception {
-    when(roomService.getRoomById(1L)).thenReturn(new Room(1L, "Alpha", 4));
-
     mockMvc
         .perform(get("/api/rooms/1"))
         .andExpect(status().isOk())
@@ -51,8 +39,6 @@ public class RoomControllerTest {
 
   @Test
   void getRoomById_returnsNotFoundWhenRoomDoesNotExist() throws Exception {
-    when(roomService.getRoomById(99L)).thenThrow(new RoomNotFoundException(99L));
-
     mockMvc.perform(get("/api/rooms/99")).andExpect(status().isNotFound());
   }
 }
