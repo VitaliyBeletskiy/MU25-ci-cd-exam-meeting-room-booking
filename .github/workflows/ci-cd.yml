@@ -1,4 +1,4 @@
-name: CI
+name: CI/CD
 
 on:
   push:
@@ -40,3 +40,14 @@ jobs:
         env:
           RENDER_DEV_DEPLOY_HOOK: ${{ secrets.RENDER_DEV_DEPLOY_HOOK }}
         run: curl --fail --show-error --silent "${RENDER_DEV_DEPLOY_HOOK}&ref=${GITHUB_SHA}"
+
+  deploy-prod:
+    needs: build
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Deploy to Render PROD
+        env:
+          RENDER_PROD_DEPLOY_HOOK: ${{ secrets.RENDER_PROD_DEPLOY_HOOK }}
+        run: curl --fail --show-error --silent "${RENDER_PROD_DEPLOY_HOOK}&ref=${GITHUB_SHA}"
