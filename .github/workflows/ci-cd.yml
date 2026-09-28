@@ -1,0 +1,53 @@
+name: CI/CD
+
+on:
+  push:
+    branches:
+      - dev
+      - main
+  pull_request:
+    branches:
+      - dev
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+
+      - name: Set up Java
+        uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      - name: Make Gradle wrapper executable
+        run: chmod +x gradlew
+
+      - name: Build and test
+        run: ./gradlew build
+
+  deploy-dev:
+    needs: build
+    if: github.event_name == 'push' && github.ref == 'refs/heads/dev'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Deploy to Render DEV
+        env:
+          RENDER_DEV_DEPLOY_HOOK: ${{ secrets.RENDER_DEV_DEPLOY_HOOK }}
+        run: curl --fail --show-error --silent "${RENDER_DEV_DEPLOY_HOOK}&ref=${GITHUB_SHA}"
+
+  deploy-prod:
+    needs: build
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Deploy to Render PROD
+        env:
+          RENDER_PROD_DEPLOY_HOOK: ${{ secrets.RENDER_PROD_DEPLOY_HOOK }}
+        run: curl --fail --show-error --silent "${RENDER_PROD_DEPLOY_HOOK}&ref=${GITHUB_SHA}"
