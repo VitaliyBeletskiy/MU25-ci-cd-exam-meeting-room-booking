@@ -29,3 +29,14 @@ jobs:
 
       - name: Build and test
         run: ./gradlew build
+
+  deploy-dev:
+    needs: build
+    if: github.event_name == 'push' && github.ref == 'refs/heads/dev'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Deploy to Render DEV
+        env:
+          RENDER_DEV_DEPLOY_HOOK: ${{ secrets.RENDER_DEV_DEPLOY_HOOK }}
+        run: curl --fail --show-error --silent "${RENDER_DEV_DEPLOY_HOOK}&ref=${GITHUB_SHA}"
