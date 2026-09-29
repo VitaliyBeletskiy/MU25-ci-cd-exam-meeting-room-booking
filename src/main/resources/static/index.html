@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>Meeting Room Booking</title>
+
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+
+  <body>
+    <main>
+      <h1>Meeting Room Booking</h1>
+
+      <section>
+        <h2>Select room</h2>
+
+        <label for="room-select">Room</label>
+        <select id="room-select">
+          <option value="">Select a room</option>
+        </select>
+      </section>
+
+      <section>
+        <h2>Bookings</h2>
+
+        <div id="bookings-list">
+          <p>Select a room to see bookings.</p>
+        </div>
+      </section>
+
+      <section>
+        <h2>Create booking</h2>
+
+        <form id="booking-form">
+          <label for="title">Title</label>
+          <input id="title" name="title" type="text" required />
+
+          <label for="start-time">Start time</label>
+          <input id="start-time" name="startTime" type="datetime-local" required />
+
+          <label for="end-time">End time</label>
+          <input id="end-time" name="endTime" type="datetime-local" required />
+
+          <label for="email">Email</label>
+          <input id="email" name="email" type="email" required />
+
+          <button type="submit">Book room</button>
+        </form>
+
+        <p id="booking-message"></p>
+      </section>
+    </main>
+
+    <script src="/app.js"></script>
+  </body>
+</html>
