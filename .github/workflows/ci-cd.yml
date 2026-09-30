@@ -30,6 +30,29 @@ jobs:
       - name: Build and test
         run: ./gradlew build
 
+      - name: Install Playwright Chromium
+        run: ./gradlew playwrightInstall
+
+      - name: Start application
+        run: |
+          nohup ./gradlew bootRun > app.log 2>&1 &
+          echo $! > app.pid
+
+      - name: Wait for application
+        run: |
+          for i in {1..30}; do
+            if curl --fail http://localhost:8080/api/rooms; then
+              exit 0
+            fi
+            sleep 2
+          done
+
+          cat app.log
+          exit 1
+
+      - name: Run E2E tests
+        run: ./gradlew e2eTest
+
   deploy-dev:
     needs: build
     if: github.event_name == 'push' && github.ref == 'refs/heads/dev'
